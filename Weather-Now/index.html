@@ -1,0 +1,132 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="script.js"></script>
+  </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Now App</title>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #e3f2fd;
+      }
+      header {
+        background: #0288d1;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 24px;
+        letter-spacing: 1px;
+      }
+      .container {
+        width: 90%;
+        max-width: 500px;
+        margin: auto;
+        margin-top: 25px;
+        text-align: center;
+      }
+      input {
+        width: 75%;
+        padding: 10px;
+        border: 1px solid #888;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button {
+        padding: 11px 20px;
+        background: #0277bd;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        margin-left: 8px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #015a8c;
+      }
+      .weather-card {
+        margin-top: 30px;
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        text-align: center;
+      }
+      .weather-card h2 {
+        margin: 5px 0;
+      }
+      .weather-card p {
+        margin: 6px 0;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>🌤️ Weather Now</header>
+
+    <div class="container">
+      <input type="text" id="cityInput" placeholder="Enter city name..." />
+      <button onclick="getWeather()">Check</button>
+
+      <div id="weatherResult"></div>
+    </div>
+
+    <script>
+      async function getWeather() {
+        const city = document.getElementById("cityInput").value.trim();
+        if (!city) {
+          alert("Please enter a city name!");
+          return;
+        }
+
+        document.getElementById("weatherResult").innerHTML =
+          "<p>Loading...</p>";
+
+        // Step 1: Get city coordinates from Open-Meteo Geo API
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`;
+
+        const geoResponse = await fetch(geoUrl);
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+          document.getElementById("weatherResult").innerHTML =
+            "<p>City not found.</p>";
+          return;
+        }
+
+        const { latitude, longitude, name, country } = geoData.results[0];
+
+        // Step 2: Get weather data using coordinates
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+
+        const weatherResponse = await fetch(weatherUrl);
+        const weatherData = await weatherResponse.json();
+
+        const weather = weatherData.current_weather;
+
+        const resultDiv = document.getElementById("weatherResult");
+        resultDiv.innerHTML = `
+                <div class="weather-card">
+                    <h2>${name}, ${country}</h2>
+                    <p><strong>Temperature:</strong> ${weather.temperature}°C</p>
+                    <p><strong>Wind Speed:</strong> ${weather.windspeed} km/h</p>
+                    <p><strong>Weather:</strong> ${weather.weathercode}</p>
+                </div>
+            `;
+      }
+    </script>
+  </body>
+</html>
