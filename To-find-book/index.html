@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Finder App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f6f6f6;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background: #4e73df;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 24px;
+      }
+      .container {
+        width: 90%;
+        max-width: 900px;
+        margin: auto;
+        padding: 20px;
+      }
+      input {
+        width: 80%;
+        padding: 12px;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button {
+        padding: 12px 20px;
+        background: #1cc88a;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin-left: 10px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #17a673;
+      }
+      .results {
+        margin-top: 20px;
+      }
+      .book {
+        display: flex;
+        background: white;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .book img {
+        width: 80px;
+        height: 110px;
+        object-fit: cover;
+        margin-right: 15px;
+        border-radius: 5px;
+        background: #ddd;
+      }
+      .book h3 {
+        margin: 0;
+      }
+      .book p {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>📚 Book Finder App</header>
+
+    <div class="container">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search book by title..."
+      />
+      <button onclick="searchBooks()">Search</button>
+
+      <div class="results" id="results"></div>
+    </div>
+
+    <script>
+      async function searchBooks() {
+        const query = document.getElementById("searchInput").value.trim();
+        if (query === "") {
+          alert("Please enter a book title!");
+          return;
+        }
+
+        const url = `https://openlibrary.org/search.json?title=${query}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = ""; // clear previous results
+
+        if (data.docs.length === 0) {
+          resultsDiv.innerHTML = "<h3>No Books Found</h3>";
+          return;
+        }
+
+        data.docs.slice(0, 10).forEach((book) => {
+          const coverId = book.cover_i;
+          const coverImg = coverId
+            ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`
+            : "https://via.placeholder.com/80x110?text=No+Cover";
+
+          const div = document.createElement("div");
+          div.classList.add("book");
+
+          div.innerHTML = `
+                    <img src="${coverImg}" alt="Book Cover" />
+                    <div>
+                        <h3>${book.title}</h3>
+                        <p><strong>Author:</strong> ${
+                          book.author_name ? book.author_name.join(", ") : "N/A"
+                        }</p>
+                        <p><strong>Published:</strong> ${
+                          book.first_publish_year || "Unknown"
+                        }</p>
+                    </div>
+                `;
+          resultsDiv.appendChild(div);
+        });
+      }
+    </script>
+  </body>
+</html>
